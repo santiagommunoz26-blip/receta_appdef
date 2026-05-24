@@ -22,25 +22,40 @@ function Home() {
       <Navbar />
 
       {/* Hero */}
-      <div style={{ background: '#F5E6CE', padding: '48px 24px 40px', textAlign: 'center' }}>
-        <div style={{ display: 'inline-block', background: '#D4793A', color: '#FDF6EE', fontSize: '12px', padding: '4px 14px', borderRadius: '20px', marginBottom: '16px', letterSpacing: '0.5px' }}>
-          Más de 200 recetas
+      <div style={{ background: '#F5E6CE', padding: '64px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '40px', flexWrap: 'wrap' }}>
+        <div style={{ maxWidth: '480px' }}>
+          <div style={{ display: 'inline-block', background: '#D4793A', color: '#FDF6EE', fontSize: '11px', padding: '5px 14px', borderRadius: '20px', marginBottom: '20px', letterSpacing: '1px', textTransform: 'uppercase' }}>
+            Más de 200 recetas
+          </div>
+          <h1 style={{ fontSize: '48px', fontWeight: 700, color: '#4A2C10', lineHeight: 1.1, marginBottom: '16px', letterSpacing: '-1.5px' }}>
+            Cocina con<br /><span style={{ color: '#D4793A' }}>amor</span> y<br />buen sabor
+          </h1>
+          <p style={{ fontSize: '16px', color: '#8B6040', marginBottom: '32px', lineHeight: 1.7 }}>
+            Descubre recetas artesanales hechas con ingredientes frescos y mucha pasión.
+          </p>
+          <div style={{ display: 'flex', background: '#FDF6EE', borderRadius: '30px', border: '0.5px solid #D4793A', overflow: 'hidden', maxWidth: '420px' }}>
+            <input
+              type="text"
+              placeholder="Buscar recetas, ingredientes..."
+              style={{ flex: 1, border: 'none', background: 'transparent', padding: '14px 22px', fontSize: '14px', color: '#4A2C10', outline: 'none' }}
+            />
+            <button style={{ background: '#D4793A', border: 'none', padding: '14px 24px', cursor: 'pointer', color: '#FDF6EE', fontSize: '14px', fontWeight: 500 }}>
+              Buscar
+            </button>
+          </div>
         </div>
-        <h1 style={{ fontSize: '36px', fontWeight: 500, color: '#4A2C10', lineHeight: 1.2, marginBottom: '12px' }}>
-          Cocina con amor<br />y buen sabor
-        </h1>
-        <p style={{ fontSize: '15px', color: '#8B6040', maxWidth: '380px', margin: '0 auto 28px', lineHeight: 1.6 }}>
-          Descubre recetas artesanales hechas con ingredientes frescos y mucha pasión.
-        </p>
-        <div style={{ display: 'flex', background: '#FDF6EE', borderRadius: '30px', border: '0.5px solid #D4793A', overflow: 'hidden', maxWidth: '420px', margin: '0 auto' }}>
-          <input
-            type="text"
-            placeholder="Buscar recetas, ingredientes..."
-            style={{ flex: 1, border: 'none', background: 'transparent', padding: '12px 20px', fontSize: '14px', color: '#4A2C10', outline: 'none' }}
-          />
-          <button style={{ background: '#D4793A', border: 'none', padding: '12px 20px', cursor: 'pointer', color: '#FDF6EE', fontSize: '14px' }}>
-            Buscar
-          </button>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', flexShrink: 0 }}>
+          {recetas.slice(0, 4).map((r, i) => (
+            <Link to={`/detalle/${r.id}`} key={r.id} style={{ textDecoration: 'none' }}>
+              <div style={{ width: '140px', height: '140px', borderRadius: '16px', overflow: 'hidden', position: 'relative', transform: i % 2 === 1 ? 'translateY(16px)' : 'none' }}>
+                <img src={r.imagen_url} alt={r.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(74,44,16,0.7))', padding: '8px', borderRadius: '0 0 16px 16px' }}>
+                  <div style={{ fontSize: '11px', color: '#FDF6EE', fontWeight: 500, lineHeight: 1.2 }}>{r.titulo}</div>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
 
