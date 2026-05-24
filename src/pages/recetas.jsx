@@ -1,24 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/navbar'
-
-const recetas = [
-  { id: 1, titulo: 'Pancakes de avena y miel', tiempo: '20 min', dificultad: 'Fácil', categoria: 'Desayunos' },
-  { id: 2, titulo: 'Pasta al pesto casero', tiempo: '35 min', dificultad: 'Media', categoria: 'Almuerzos' },
-  { id: 3, titulo: 'Galletas de chocolate', tiempo: '45 min', dificultad: 'Fácil', categoria: 'Postres' },
-  { id: 4, titulo: 'Cazuela de verduras', tiempo: '50 min', dificultad: 'Media', categoria: 'Almuerzos' },
-  { id: 5, titulo: 'Smoothie de frutas', tiempo: '10 min', dificultad: 'Fácil', categoria: 'Bebidas' },
-  { id: 6, titulo: 'Tostadas con aguacate', tiempo: '15 min', dificultad: 'Fácil', categoria: 'Desayunos' },
-  { id: 7, titulo: 'Sopa de tomate casera', tiempo: '30 min', dificultad: 'Fácil', categoria: 'Almuerzos' },
-  { id: 8, titulo: 'Brownie de chocolate', tiempo: '40 min', dificultad: 'Media', categoria: 'Postres' },
-  { id: 9, titulo: 'Limonada de jengibre', tiempo: '10 min', dificultad: 'Fácil', categoria: 'Bebidas' },
-]
+import { supabase } from '../lib/supabase'
 
 const categorias = ['Todos', 'Desayunos', 'Almuerzos', 'Postres', 'Bebidas']
 
 function Recetas() {
+  const [recetas, setRecetas] = useState([])
   const [categoriaActiva, setCategoriaActiva] = useState('Todos')
   const [busqueda, setBusqueda] = useState('')
+
+  useEffect(() => {
+    async function cargar() {
+      const { data } = await supabase.from('recetas').select('*')
+      if (data) setRecetas(data)
+    }
+    cargar()
+  }, [])
 
   const filtradas = recetas.filter(r => {
     const coincideCategoria = categoriaActiva === 'Todos' || r.categoria === categoriaActiva
@@ -62,9 +60,11 @@ function Recetas() {
         {filtradas.map(r => (
           <Link to={`/detalle/${r.id}`} key={r.id} style={{ textDecoration: 'none' }}>
             <div style={{ background: '#FFF8F0', borderRadius: '12px', border: '0.5px solid #E8D5BC', overflow: 'hidden' }}>
-              <div style={{ height: '130px', background: '#FDEBD0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', color: '#A07850' }}>
-                imagen
-              </div>
+              <img
+  src={r.imagen_url}
+  alt={r.titulo}
+  style={{ width: '100%', height: '130px', objectFit: 'cover' }}
+/>
               <div style={{ padding: '12px' }}>
                 <div style={{ fontSize: '13px', fontWeight: 500, color: '#4A2C10', marginBottom: '8px', lineHeight: 1.3 }}>{r.titulo}</div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

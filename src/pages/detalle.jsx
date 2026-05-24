@@ -1,30 +1,25 @@
 import { useParams, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import Navbar from '../components/navbar'
-
-const recetas = [
-  {
-    id: 1, titulo: 'Pancakes de avena y miel', tiempo: '20 min', dificultad: 'Fácil', categoria: 'Desayunos', porciones: 4,
-    descripcion: 'Unos pancakes esponjosos y nutritivos, perfectos para empezar el día con energía. Hechos con avena integral y endulzados naturalmente con miel.',
-    ingredientes: ['1 taza de avena molida', '1 huevo', '1 taza de leche', '2 cucharadas de miel', '1 cucharadita de polvo de hornear', 'Pizca de sal'],
-    pasos: ['Mezcla la avena, el polvo de hornear y la sal en un tazón.', 'En otro tazón bate el huevo, la leche y la miel.', 'Une las mezclas hasta obtener una masa homogénea.', 'Calienta una sartén a fuego medio y vierte porciones de masa.', 'Cocina 2-3 minutos por lado hasta dorar.']
-  },
-  {
-    id: 2, titulo: 'Pasta al pesto casero', tiempo: '35 min', dificultad: 'Media', categoria: 'Almuerzos', porciones: 2,
-    descripcion: 'Una pasta fresca con pesto hecho en casa, llena de sabor y aroma. El secreto está en usar albahaca fresca y un buen aceite de oliva.',
-    ingredientes: ['250g de pasta', '2 tazas de albahaca fresca', '3 dientes de ajo', '50g de piñones', '60ml de aceite de oliva', 'Sal y pimienta al gusto'],
-    pasos: ['Cocina la pasta según las instrucciones del paquete.', 'Procesa la albahaca, ajo y piñones en una licuadora.', 'Agrega el aceite de oliva poco a poco mientras procesas.', 'Mezcla el pesto con la pasta caliente.', 'Sirve de inmediato.']
-  },
-  {
-    id: 3, titulo: 'Galletas de chocolate', tiempo: '45 min', dificultad: 'Fácil', categoria: 'Postres', porciones: 12,
-    descripcion: 'Galletas crujientes por fuera y suaves por dentro, con trozos generosos de chocolate en cada mordida.',
-    ingredientes: ['2 tazas de harina', '1 taza de mantequilla', '3/4 taza de azúcar', '2 huevos', '1 taza de chips de chocolate', '1 cucharadita de vainilla'],
-    pasos: ['Precalienta el horno a 180°C.', 'Bate la mantequilla con el azúcar hasta cremar.', 'Agrega los huevos y la vainilla.', 'Incorpora la harina y los chips de chocolate.', 'Forma bolitas y hornea 12 minutos.']
-  },
-]
+import { supabase } from '../lib/supabase'
 
 function Detalle() {
   const { id } = useParams()
-  const receta = recetas.find(r => r.id === parseInt(id))
+  const [receta, setReceta] = useState(null)
+
+  useEffect(() => {
+    async function cargar() {
+      const { data } = await supabase.from('recetas').select('*').eq('id', id).single()
+      if (data) {
+  setReceta({
+    ...data,
+    ingredientes: data.ingredientes ? data.ingredientes.split(',') : [],
+    pasos: data.pasos ? data.pasos.split('.').filter(p => p.trim() !== '') : [],
+  })
+}
+    }
+    cargar()
+  }, [id])
 
   if (!receta) {
     return (
@@ -43,9 +38,11 @@ function Detalle() {
       <Navbar />
 
       {/* Imagen hero */}
-      <div style={{ height: '240px', background: '#FDEBD0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: '14px', color: '#A07850' }}>imagen de la receta</span>
-      </div>
+      <img
+  src={receta.imagen_url}
+  alt={receta.titulo}
+  style={{ width: '100%', height: '240px', objectFit: 'cover' }}
+/>
 
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: '32px 24px' }}>
 
