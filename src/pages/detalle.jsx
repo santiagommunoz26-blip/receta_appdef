@@ -25,93 +25,95 @@ function Detalle() {
     return (
       <div style={{ background: '#fff8f1', minHeight: '100vh' }}>
         <Navbar />
-        <div className="flex items-center justify-center h-64">
-          <p className="text-sm" style={{ color: '#554339' }}>Cargando receta...</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+          <p style={{ fontSize: '14px', color: '#887367' }}>Cargando receta...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="pb-24 md:pb-0" style={{ background: '#fff8f1', minHeight: '100vh' }}>
+    <div style={{ background: '#fff8f1', minHeight: '100vh' }} className="pb-24 md:pb-0">
       <Navbar />
 
-      {/* Hero imagen */}
-      <div className="w-full overflow-hidden" style={{ height: '420px' }}>
+      {/* Hero imagen con overlay */}
+      <div style={{ position: 'relative', width: '100%', height: '480px', overflow: 'hidden' }}>
         <img
           src={receta.imagen_url}
           alt={receta.titulo}
-          className="w-full h-full object-cover"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(30,27,23,0.75) 100%)' }} />
+        <div style={{ position: 'absolute', bottom: '32px', left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '1200px', padding: '0 64px' }}>
+          <span style={{ display: 'inline-block', background: '#ffdbc8', color: '#934707', fontSize: '11px', fontWeight: 700, padding: '5px 14px', borderRadius: '20px', marginBottom: '12px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+            {receta.categoria}
+          </span>
+          <h1 style={{ fontSize: '42px', fontWeight: 700, color: '#ffffff', letterSpacing: '-1px', lineHeight: 1.1, maxWidth: '700px' }}>
+            {receta.titulo}
+          </h1>
+        </div>
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-5 md:px-16 -mt-12 relative z-10">
+      <div className="max-w-[1200px] mx-auto px-5 md:px-16 py-12">
 
-        {/* Header card */}
-        <div className="rounded-2xl p-6 md:p-10 mb-10 border" style={{ background: '#ffffff', borderColor: '#dac2b4' }}>
-          <div className="flex flex-col gap-3">
-            <span className="inline-flex w-fit px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider" style={{ background: '#f4ede5', color: '#554339' }}>
-              {receta.categoria}
-            </span>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight" style={{ color: '#1e1b17' }}>
-              {receta.titulo}
-            </h1>
-            <p className="text-base leading-relaxed max-w-2xl" style={{ color: '#554339' }}>
-              {receta.descripcion}
-            </p>
-          </div>
-
-          {/* Datos rápidos */}
-          <div className="grid grid-cols-3 gap-4 mt-8">
+        {/* Descripción y datos rápidos */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '40px', alignItems: 'start', marginBottom: '48px' }}>
+          <p style={{ fontSize: '17px', color: '#554339', lineHeight: 1.7, maxWidth: '600px' }}>
+            {receta.descripcion}
+          </p>
+          <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
             {[
               { label: 'Tiempo', valor: receta.tiempo },
               { label: 'Nivel', valor: receta.dificultad },
-              { label: 'Porciones', valor: receta.porciones || '2 pers' },
+              { label: 'Porciones', valor: receta.porciones || '2' },
             ].map(item => (
-              <div key={item.label} className="flex flex-col items-center text-center p-4 rounded-xl border" style={{ background: '#fff8f1', borderColor: '#dac2b4' }}>
-                <span className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#554339' }}>{item.label}</span>
-                <span className="text-base font-bold" style={{ color: '#1e1b17' }}>{item.valor}</span>
+              <div key={item.label} style={{ textAlign: 'center', padding: '16px 20px', borderRadius: '14px', border: '1px solid #dac2b4', background: '#ffffff', minWidth: '90px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: '#887367', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>{item.label}</div>
+                <div style={{ fontSize: '16px', fontWeight: 700, color: '#1e1b17' }}>{item.valor}</div>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Separador */}
+        <div style={{ borderTop: '1px solid #e8e1da', marginBottom: '48px' }} />
+
         {/* Contenido */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-16">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '48px', marginBottom: '60px' }}>
 
           {/* Ingredientes */}
-          <section className="lg:col-span-4">
-            <h2 className="text-2xl font-bold mb-6" style={{ color: '#1e1b17' }}>Ingredientes</h2>
-            <ul className="space-y-3">
+          <div>
+            <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#1e1b17', marginBottom: '20px' }}>Ingredientes</h2>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {receta.ingredientes.map((ing, i) => (
-                <li key={i} className="flex items-center gap-3 p-3 rounded-xl border" style={{ background: '#f9f3eb', borderColor: '#dac2b4' }}>
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#934707' }}></span>
-                  <span className="text-sm" style={{ color: '#1e1b17' }}>{ing.trim()}</span>
+                <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px', border: '1px solid #e8e1da', background: '#ffffff' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#934707', flexShrink: 0 }}></span>
+                  <span style={{ fontSize: '14px', color: '#1e1b17' }}>{ing.trim()}</span>
                 </li>
               ))}
             </ul>
-          </section>
+          </div>
 
           {/* Pasos */}
-          <section className="lg:col-span-8">
-            <h2 className="text-2xl font-bold mb-6" style={{ color: '#1e1b17' }}>Preparación</h2>
-            <div className="space-y-4">
+          <div>
+            <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#1e1b17', marginBottom: '20px' }}>Preparación</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {receta.pasos.map((paso, i) => (
-                <div key={i} className="flex gap-4 items-start p-5 rounded-xl border" style={{ background: '#ffffff', borderColor: '#dac2b4' }}>
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: '#934707', color: '#ffffff' }}>
+                <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', padding: '20px', borderRadius: '14px', border: '1px solid #e8e1da', background: '#ffffff' }}>
+                  <div style={{ flexShrink: 0, width: '36px', height: '36px', borderRadius: '50%', background: '#934707', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 700 }}>
                     {i + 1}
                   </div>
-                  <p className="text-sm leading-relaxed pt-2" style={{ color: '#554339' }}>{paso.trim()}</p>
+                  <p style={{ fontSize: '15px', color: '#554339', lineHeight: 1.7, paddingTop: '6px' }}>{paso.trim()}</p>
                 </div>
               ))}
             </div>
-          </section>
+          </div>
 
         </div>
 
         {/* Volver */}
-        <div className="flex justify-center mb-20">
-          <Link to="/recetas" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold border transition-all" style={{ background: '#ffffff', borderColor: '#dac2b4', color: '#554339', textDecoration: 'none' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '40px' }}>
+          <Link to="/recetas" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '50px', border: '1px solid #dac2b4', background: '#ffffff', color: '#554339', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}>
             ← Volver a recetas
           </Link>
         </div>
