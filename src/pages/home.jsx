@@ -7,6 +7,7 @@ const categorias = ['Todos', 'Desayunos', 'Almuerzos', 'Postres', 'Bebidas']
 
 function Home() {
   const [recetas, setRecetas] = useState([])
+  const [categoriaActiva, setCategoriaActiva] = useState('Todos')
 
   useEffect(() => {
     async function cargar() {
@@ -16,85 +17,108 @@ function Home() {
     cargar()
   }, [])
 
-  return (
+  const filtradas = categoriaActiva === 'Todos'
+    ? recetas
+    : recetas.filter(r => r.categoria === categoriaActiva)
 
-    <div style={{ background: '#FDF6EE', minHeight: '100vh' }}>
+  return (
+    <div className="pb-24 md:pb-0" style={{ background: '#fff8f1', minHeight: '100vh' }}>
       <Navbar />
 
-      {/* Hero */}
-      <div style={{ background: '#F5E6CE', padding: '64px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '40px', flexWrap: 'wrap' }}>
-        <div style={{ maxWidth: '480px' }}>
-          <div style={{ display: 'inline-block', background: '#D4793A', color: '#FDF6EE', fontSize: '11px', padding: '5px 14px', borderRadius: '20px', marginBottom: '20px', letterSpacing: '1px', textTransform: 'uppercase' }}>
-            Más de 200 recetas
-          </div>
-          <h1 style={{ fontSize: '48px', fontWeight: 700, color: '#4A2C10', lineHeight: 1.1, marginBottom: '16px', letterSpacing: '-1.5px' }}>
-            Cocina con<br /><span style={{ color: '#D4793A' }}>amor</span> y<br />buen sabor
-          </h1>
-          <p style={{ fontSize: '16px', color: '#8B6040', marginBottom: '32px', lineHeight: 1.7 }}>
-            Descubre recetas artesanales hechas con ingredientes frescos y mucha pasión.
-          </p>
-          <div style={{ display: 'flex', background: '#FDF6EE', borderRadius: '30px', border: '0.5px solid #D4793A', overflow: 'hidden', maxWidth: '420px' }}>
-            <input
-              type="text"
-              placeholder="Buscar recetas, ingredientes..."
-              style={{ flex: 1, border: 'none', background: 'transparent', padding: '14px 22px', fontSize: '14px', color: '#4A2C10', outline: 'none' }}
-            />
-            <button style={{ background: '#D4793A', border: 'none', padding: '14px 24px', cursor: 'pointer', color: '#FDF6EE', fontSize: '14px', fontWeight: 500 }}>
-              Buscar
-            </button>
-          </div>
-        </div>
+      <main className="max-w-[1200px] mx-auto px-5 md:px-16">
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', flexShrink: 0 }}>
-          {recetas.slice(0, 4).map((r, i) => (
-            <Link to={`/detalle/${r.id}`} key={r.id} style={{ textDecoration: 'none' }}>
-              <div style={{ width: '140px', height: '140px', borderRadius: '16px', overflow: 'hidden', position: 'relative', transform: i % 2 === 1 ? 'translateY(16px)' : 'none' }}>
-                <img src={r.imagen_url} alt={r.titulo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(74,44,16,0.7))', padding: '8px', borderRadius: '0 0 16px 16px' }}>
-                  <div style={{ fontSize: '11px', color: '#FDF6EE', fontWeight: 500, lineHeight: 1.2 }}>{r.titulo}</div>
-                </div>
-              </div>
+        {/* Hero */}
+        <section className="flex flex-col lg:flex-row items-center gap-12 py-16">
+
+          {/* Texto izquierda */}
+          <div className="flex-1 space-y-6">
+            <div className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase" style={{ background: '#ffdbc8', color: '#934707' }}>
+              Más de 200 recetas
+            </div>
+            <h2 className="text-5xl font-bold leading-tight tracking-tight" style={{ color: '#1e1b17' }}>
+              Cocina con<br /><span style={{ color: '#934707' }}>amor</span> y<br />buen sabor
+            </h2>
+            <p className="text-base leading-relaxed" style={{ color: '#554339' }}>
+              Descubre recetas artesanales hechas con ingredientes frescos y mucha pasión.
+            </p>
+            <div className="relative max-w-md">
+              <input
+                className="w-full px-5 py-4 text-sm rounded-xl outline-none border"
+                style={{ background: '#ffffff', borderColor: '#dac2b4', color: '#1e1b17' }}
+                placeholder="Buscar recetas, ingredientes..."
+                type="text"
+              />
+            </div>
+            <Link to="/recetas" className="inline-block px-8 py-3.5 rounded-full text-sm font-semibold transition-all" style={{ background: '#934707', color: '#ffffff' }}>
+              Explorar recetas
             </Link>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Categorías */}
-      <div style={{ padding: '24px 24px 8px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-        {categorias.map(cat => (
-          <button key={cat} style={{ padding: '8px 18px', borderRadius: '20px', fontSize: '13px', cursor: 'pointer', border: '0.5px solid #E8D5BC', background: cat === 'Todos' ? '#D4793A' : '#FDF6EE', color: cat === 'Todos' ? '#FDF6EE' : '#8B6040' }}>
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Recetas */}
-      <div style={{ padding: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-          <span style={{ fontSize: '17px', fontWeight: 500, color: '#4A2C10' }}>Recetas populares</span>
-          <Link to="/recetas" style={{ fontSize: '13px', color: '#D4793A', textDecoration: 'none' }}>Ver todas →</Link>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
-          {recetas.map(r => (
-            <Link to={`/detalle/${r.id}`} key={r.id} style={{ textDecoration: 'none' }}>
-              <div style={{ background: '#FFF8F0', borderRadius: '12px', border: '0.5px solid #E8D5BC', overflow: 'hidden' }}>
+          {/* Collage derecha */}
+          <div className="flex-1 grid grid-cols-2 gap-4" style={{ paddingBottom: '24px' }}>
+            {recetas.slice(0, 4).map((r, i) => (
+              <Link to={`/detalle/${r.id}`} key={r.id} style={{ display: 'block', transform: i % 2 === 1 ? 'translateY(24px)' : 'none' }}>
                 <img
-  src={r.imagen_url}
-  alt={r.titulo}
-  style={{ width: '100%', height: '110px', objectFit: 'cover' }}
-/>
-                <div style={{ padding: '12px' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 500, color: '#4A2C10', marginBottom: '6px', lineHeight: 1.3 }}>{r.titulo}</div>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <span style={{ fontSize: '11px', color: '#A07850' }}>{r.tiempo}</span>
-                    <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '10px', background: '#F5E6CE', color: '#D4793A' }}>{r.dificultad}</span>
-                  </div>
+                  src={r.imagen_url}
+                  alt={r.titulo}
+                  className="w-full object-cover rounded-2xl"
+                  style={{ height: i % 2 === 0 ? '180px' : '220px', borderRadius: '16px' }}
+                />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Categorías */}
+        <section className="mb-8">
+          <div className="flex items-center gap-3 overflow-x-auto pb-2">
+            {categorias.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setCategoriaActiva(cat)}
+                className="px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all"
+                style={{
+                  background: cat === categoriaActiva ? '#934707' : '#f4ede5',
+                  color: cat === categoriaActiva ? '#ffffff' : '#554339',
+                  border: '0.5px solid',
+                  borderColor: cat === categoriaActiva ? '#934707' : '#dac2b4',
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Título sección */}
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-semibold" style={{ color: '#1e1b17' }}>Recetas populares</h3>
+          <Link to="/recetas" className="text-sm font-medium" style={{ color: '#934707', textDecoration: 'none' }}>Ver todas →</Link>
+        </div>
+
+        {/* Grid de recetas */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+          {filtradas.map(r => (
+            <Link to={`/detalle/${r.id}`} key={r.id} className="group cursor-pointer" style={{ textDecoration: 'none' }}>
+              <div className="relative overflow-hidden rounded-xl mb-3" style={{ aspectRatio: '4/3', background: '#f9f3eb' }}>
+                <img
+                  src={r.imagen_url}
+                  alt={r.titulo}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-sm font-semibold" style={{ color: '#1e1b17' }}>{r.titulo}</h3>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs" style={{ color: '#554339' }}>{r.tiempo}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#ffdbc8', color: '#934707' }}>{r.dificultad}</span>
                 </div>
               </div>
             </Link>
           ))}
-        </div>
-      </div>
+        </section>
+
+      </main>
     </div>
   )
 }
