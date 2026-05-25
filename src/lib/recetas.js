@@ -1,3 +1,13 @@
+import { obtenerInstruccionesEs } from '../data/instruccionesEs';
+import {
+  formatearIngredienteEs,
+  traducirArea,
+  traducirCategoria,
+  traducirIngrediente as traducirIngredienteBase,
+  traducirMedida,
+} from './espanol';
+
+/** Normaliza texto de ingrediente para comparar despensa vs receta */
 export function normalizarIngrediente(texto) {
   return (texto || '')
     .toLowerCase()
@@ -8,6 +18,7 @@ export function normalizarIngrediente(texto) {
     .trim();
 }
 
+/** Alias español → términos en inglés (base MealDB) */
 export const ALIAS_INGREDIENTES = {
   huevo: ['egg', 'egg yolk', 'egg whites'],
   huevos: ['egg', 'egg yolk', 'egg whites'],
@@ -49,7 +60,7 @@ export const SUSTITUCIONES = {
   bread: ['Tortillas integrales', 'Galletas de arroz'],
   cheese: ['Queso vegano', 'Nutritional yeast'],
   mushrooms: ['Berenjena en cubos', 'Calabacín'],
-  olive: ['Aceite de girasol', 'Aceite de aguacate'],
+  'olive oil': ['Aceite de girasol', 'Aceite de aguacate'],
   butter: ['Aceite de oliva', 'Margarina vegetal'],
   salmon: ['Trucha', 'Atún fresco', 'Tofu ahumado'],
   avocado: ['Hummus', 'Puré de calabaza'],
@@ -78,6 +89,7 @@ export function expandirDespensa(ingredientesUsuario) {
     keys.add(norm);
     const alias = ALIAS_INGREDIENTES[norm];
     if (alias) alias.forEach((a) => keys.add(normalizarIngrediente(a)));
+    keys.add(norm);
   }
   return keys;
 }
@@ -111,14 +123,20 @@ export function parsePasos(instrucciones) {
   }
 
   const bloques = instrucciones
-    .split(/\r?\n\r?\n/)
+    .split(/\r?\n\r?\n+/)
     .map((b) => b.trim())
     .filter(Boolean);
+
+  const limpiarPaso = (texto) =>
+    texto
+      .replace(/^(?:paso|step|STEP|PASO)\s*\d+\s*[:\-.]?\s*/i, '')
+      .replace(/^\d+\s*[\n.]?\s*/, '')
+      .trim();
 
   if (bloques.length > 1) {
     return bloques.map((texto, i) => ({
       titulo: `Paso ${i + 1}`,
-      texto: texto.replace(/^\d+\s*[.\-]?\s*/, ''),
+      texto: limpiarPaso(texto),
     }));
   }
 
@@ -130,7 +148,7 @@ export function parsePasos(instrucciones) {
   if (lineas.length > 1) {
     return lineas.map((texto, i) => ({
       titulo: `Paso ${i + 1}`,
-      texto: texto.replace(/^\d+\s*[.\-]?\s*/, ''),
+      texto: limpiarPaso(texto),
     }));
   }
 
@@ -142,20 +160,24 @@ export function normalizarReceta(row) {
   const medidas = parseJsonArray(row.medidas);
 
   const ingredientesList = nombres
-    .map((nombre, i) => ({
-      nombre: nombre?.trim() || '',
-      medida: medidas[i]?.trim() || '',
-      key: normalizarIngrediente(nombre),
-    }))
+    .map((nombre, i) => {
+      const original = nombre?.trim() || '';
+      return {
+        nombre: traducirIngredienteBase(original),
+        nombreOriginal: original,
+        medida: traducirMedida(medidas[i]?.trim() || ''),
+        key: normalizarIngrediente(original),
+      };
+    })
     .filter((i) => i.nombre);
 
   return {
     id: String(row.id),
     nombre: row.nombre,
-    categoria: row.categoria || 'Variado',
-    area: row.area || '',
+    categoria: traducirCategoria(row.categoria || 'Variado'),
+    area: traducirArea(row.area || ''),
     imagen_url: row.imagen_url,
-    instrucciones: row.instrucciones || '',
+    instrucciones: obtenerInstruccionesEs(row.id, row.instrucciones || ''),
     ingredientesList,
     tiempo: estimarTiempo(row.instrucciones),
     dificultad: ingredientesList.length > 9 ? 'Media' : 'Fácil',
@@ -172,13 +194,22 @@ export function puntuarReceta(receta, despensaKeys) {
   return coincidencias / total;
 }
 
-export function filtrarRecetasPorDespensa(recetas, despensa, minimo = 0.2) {
+export function filtrarRecetasPorDespensa(recetas, despensa) {
   if (!despensa.length) return recetas;
   const keys = expandirDespensa(despensa);
+  
+  // Si tienes pocos ingredientes, sé más flexible
+  const maxFaltantes = despensa.length <= 2 ? 5 : 3;
+  
   return recetas
-    .map((r) => ({ receta: r, score: puntuarReceta(r, keys) }))
-    .filter(({ score }) => score >= minimo)
-    .sort((a, b) => b.score - a.score)
+    .map((r) => {
+      const faltantes = r.ingredientesList.filter(
+        (ing) => !ingredienteCoincide(ing.nombre, keys)
+      ).length;
+      return { receta: r, faltantes };
+    })
+    .filter(({ faltantes }) => faltantes <= maxFaltantes)
+    .sort((a, b) => a.faltantes - b.faltantes)
     .map(({ receta }) => receta);
 }
 
@@ -192,36 +223,9 @@ export function obtenerSustitutos(ingredienteKey) {
 }
 
 export function traducirIngrediente(nombre) {
-  const mapa = {
-    egg: 'Huevo',
-    milk: 'Leche',
-    rice: 'Arroz',
-    tomato: 'Tomate',
-    onion: 'Cebolla',
-    garlic: 'Ajo',
-    chicken: 'Pollo',
-    bread: 'Pan',
-    cheese: 'Queso',
-    butter: 'Mantequilla',
-    sugar: 'Azúcar',
-    salt: 'Sal',
-    mushrooms: 'Champiñones',
-    'olive oil': 'Aceite de oliva',
-    pork: 'Cerdo',
-    salmon: 'Salmón',
-    avocado: 'Aguacate',
-    potatoes: 'Papa',
-    carrot: 'Zanahoria',
-    lemon: 'Limón',
-  };
-  const norm = normalizarIngrediente(nombre);
-  for (const [en, es] of Object.entries(mapa)) {
-    if (norm === en || norm.includes(en)) return es;
-  }
-  return nombre;
+  return traducirIngredienteBase(nombre);
 }
 
 export function formatearIngrediente(nombre, medida) {
-  const etiqueta = traducirIngrediente(nombre);
-  return medida ? `${medida} ${etiqueta}` : etiqueta;
+  return formatearIngredienteEs(nombre, medida);
 }
