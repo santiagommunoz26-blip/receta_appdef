@@ -46,9 +46,9 @@ export default function Recetas() {
             <p className="font-body-md text-body-md text-on-surface-variant mb-stack-md">
               No encontramos recetas con esos ingredientes. Prueba agregar más o ver todas.
             </p>
-            <a href="/recetas?todas=1" className="text-primary font-label-lg text-label-lg underline">
+            <Link to="/recetas?todas=1" className="text-primary font-label-lg text-label-lg underline">
               Ver catálogo completo
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="flex flex-col gap-stack-md">

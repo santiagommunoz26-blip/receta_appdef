@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import Logo from '../components/Logo';
 
 export default function Welcome() {
   const { user, loading } = useAuth();
@@ -18,12 +19,8 @@ export default function Welcome() {
 
       <main className="flex-grow w-full max-w-md px-margin-mobile flex flex-col items-center justify-center space-y-section-gap">
         <div className="flex flex-col items-center space-y-stack-md">
-          <div className="w-48 h-48 bg-surface-container-lowest rounded-full flex items-center justify-center p-6 border border-outline-variant overflow-hidden">
-            <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7Q57fV3OKfJ8MdDj75VuhPMa-fT2lfNzwCXovlAU2oHJudroFLp6Z1j99yLCL9y4cAvjMSjhI5XcB5pItFxUOeXK_BcQmsTj0gPV_CxedRB0oAOPXnMUo1LWRyAsaKo0fW8eOGi1_I4Cax83i9M1bqtTpU6vzR1Abk-9vPWStqGgE6TZaVbmgU61T8caRv3pjlo_c3MzGjiCxQXN65A2bcAqCkJAu4hmgza2rVr7UPaZM0UOyEdud8nwaSSPJE9T9UgLCAoWzydh2"
-              alt="RecetaFácil Logo"
-              className="w-full h-full object-cover rounded-full"
-            />
+          <div className="w-48 h-48 bg-surface-container-lowest rounded-full flex items-center justify-center border border-outline-variant shadow-sm">
+            <Logo size={160} />
           </div>
           <h1 className="font-headline-xl text-headline-xl text-primary font-extrabold text-center">RecetaFácil</h1>
         </div>

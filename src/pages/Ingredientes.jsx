@@ -2,12 +2,13 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import { useDespensa } from '../context/IngredientesContext';
-import { ALIAS_INGREDIENTES, SUGERIDOS_POPULARES, normalizarIngrediente } from '../lib/recetas';
+import { SUGERIDOS_POPULARES, normalizarIngrediente } from '../lib/recetas';
 
 const CATALOGO_BUSQUEDA = [
   ...SUGERIDOS_POPULARES,
-  ...Object.keys(ALIAS_INGREDIENTES).map((k) => k.charAt(0).toUpperCase() + k.slice(1)),
-  'Garlic', 'Onion', 'Chicken', 'Rice', 'Egg', 'Milk', 'Butter', 'Cheese', 'Salmon', 'Mushrooms',
+  'Ajo', 'Cebolla', 'Pollo', 'Arroz', 'Huevo', 'Leche', 'Mantequilla', 'Queso', 'Papa',
+  'Champiñones', 'Pimiento', 'Zanahoria', 'Limón', 'Harina', 'Azúcar', 'Garbanzos', 'Lentejas',
+  'Aceite de oliva', 'Perejil', 'Tomate cherry', 'Atún', 'Salmón', 'Crema', 'Yogur',
 ];
 
 export default function Ingredientes() {
@@ -36,7 +37,7 @@ export default function Ingredientes() {
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
-      <AppHeader subtitulo="Ingredientes" showBack backTo="/" />
+      <AppHeader subtitulo="Ingredientes" showBack backTo="/welcome" />
 
       <main className="flex-1 px-margin-mobile pt-stack-sm pb-32">
         <div className="mb-stack-lg">

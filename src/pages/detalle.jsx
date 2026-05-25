@@ -4,12 +4,8 @@ import SubstituteModal from '../components/SubstituteModal';
 import { useDespensa } from '../context/IngredientesContext';
 import { useFavoritos } from '../context/FavoritosContext';
 import { obtenerRecetaPorId } from '../hooks/useRecetas';
-import {
-  expandirDespensa,
-  ingredienteCoincide,
-  obtenerSustitutos,
-  traducirIngrediente,
-} from '../lib/recetas';
+import { expandirDespensa, ingredienteCoincide } from '../lib/recetas';
+import { obtenerSustitutosPara } from '../lib/sustituciones';
 
 export default function Detalle() {
   const { id } = useParams();
@@ -220,8 +216,8 @@ export default function Detalle() {
       </div>
 
       <SubstituteModal
-        ingrediente={modalIngrediente ? traducirIngrediente(modalIngrediente.nombre) : null}
-        opciones={modalIngrediente ? obtenerSustitutos(modalIngrediente.key) : []}
+        ingrediente={modalIngrediente?.nombre ?? null}
+        opciones={modalIngrediente ? obtenerSustitutosPara(modalIngrediente, despensa) : []}
         onElegir={aplicarSustituto}
         onCerrar={() => setModalIngrediente(null)}
       />

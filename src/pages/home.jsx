@@ -6,7 +6,7 @@ import RecetaCard from '../components/RecetaCard';
 import { useAuth } from '../context/AuthContext';
 import { useRecetas } from '../hooks/useRecetas';
 
-const categorias = ['Todos', 'Postres', 'Vegetariano', 'Pollo', 'Carnes', 'Variado'];
+const categorias = ['Todos', 'Postres', 'Vegetariano', 'Pollo', 'Carnes', 'Mariscos', 'Acompañamientos', 'Variado'];
 
 export default function Home() {
   const { user } = useAuth();

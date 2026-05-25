@@ -179,7 +179,7 @@ export function normalizarReceta(row) {
     imagen_url: row.imagen_url,
     instrucciones: obtenerInstruccionesEs(row.id, row.instrucciones || ''),
     ingredientesList,
-    tiempo: estimarTiempo(row.instrucciones),
+    tiempo: estimarTiempo(obtenerInstruccionesEs(row.id, row.instrucciones || '')),
     dificultad: ingredientesList.length > 9 ? 'Media' : 'Fácil',
     porciones: ingredientesList.length > 6 ? '4 porciones' : '2 porciones',
   };
@@ -189,7 +189,7 @@ export function puntuarReceta(receta, despensaKeys) {
   if (!despensaKeys.size) return 0;
   const total = receta.ingredientesList.length || 1;
   const coincidencias = receta.ingredientesList.filter((ing) =>
-    ingredienteCoincide(ing.nombre, despensaKeys)
+    ingredienteCoincide(ing.nombreOriginal || ing.nombre, despensaKeys)
   ).length;
   return coincidencias / total;
 }
@@ -204,22 +204,13 @@ export function filtrarRecetasPorDespensa(recetas, despensa) {
   return recetas
     .map((r) => {
       const faltantes = r.ingredientesList.filter(
-        (ing) => !ingredienteCoincide(ing.nombre, keys)
+        (ing) => !ingredienteCoincide(ing.nombreOriginal || ing.nombre, keys)
       ).length;
       return { receta: r, faltantes };
     })
     .filter(({ faltantes }) => faltantes <= maxFaltantes)
     .sort((a, b) => a.faltantes - b.faltantes)
     .map(({ receta }) => receta);
-}
-
-export function obtenerSustitutos(ingredienteKey) {
-  const norm = normalizarIngrediente(ingredienteKey);
-  if (SUSTITUCIONES[norm]) return SUSTITUCIONES[norm];
-  for (const [key, lista] of Object.entries(SUSTITUCIONES)) {
-    if (norm.includes(key) || key.includes(norm)) return lista;
-  }
-  return ['Versión vegana', 'Opción sin gluten', 'Ingrediente de temporada'];
 }
 
 export function traducirIngrediente(nombre) {

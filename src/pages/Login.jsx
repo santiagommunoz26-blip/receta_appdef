@@ -1,19 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Logo from '../components/Logo';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, loading: authLoading } = useAuth();
   const [modo, setModo] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  if (user) {
-    navigate('/home', { replace: true });
-    return null;
+  useEffect(() => {
+    if (!authLoading && user) navigate('/home', { replace: true });
+  }, [user, authLoading, navigate]);
+
+  if (authLoading || user) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center text-on-surface-variant">
+        Cargando...
+      </div>
+    );
   }
 
   async function handleSubmit(e) {
@@ -39,12 +47,15 @@ export default function Login() {
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col">
       <div className="w-full px-margin-mobile pt-stack-md">
-        <Link to="/" className="material-symbols-outlined text-primary inline-flex p-2 hover:bg-surface-container rounded-full">
+        <Link to="/welcome" className="material-symbols-outlined text-primary inline-flex p-2 hover:bg-surface-container rounded-full">
           arrow_back
         </Link>
       </div>
 
       <main className="flex-grow px-margin-mobile flex flex-col justify-center max-w-md mx-auto w-full pb-stack-lg">
+        <div className="flex justify-center mb-stack-lg">
+          <Logo size={80} />
+        </div>
         <h1 className="font-headline-xl text-headline-xl text-primary font-extrabold mb-2">
           {modo === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
         </h1>

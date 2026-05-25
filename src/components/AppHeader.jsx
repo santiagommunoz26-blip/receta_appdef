@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Logo from './Logo';
 
 export default function AppHeader({
   titulo = 'RecetaFácil',
@@ -35,13 +36,16 @@ export default function AppHeader({
             arrow_back
           </button>
         ) : null}
-        <div className="flex flex-col min-w-0">
-          {subtitulo ? (
-            <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider truncate">
-              {subtitulo}
-            </span>
-          ) : null}
-          <span className="font-headline-xl text-headline-xl font-extrabold text-primary truncate">{titulo}</span>
+        <div className="flex items-center gap-2 min-w-0">
+          {!showBack ? <Logo size={36} className="shrink-0" /> : null}
+          <div className="flex flex-col min-w-0">
+            {subtitulo ? (
+              <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider truncate">
+                {subtitulo}
+              </span>
+            ) : null}
+            <span className="font-headline-xl text-headline-xl font-extrabold text-primary truncate">{titulo}</span>
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-1">
