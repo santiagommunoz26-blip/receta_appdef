@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import BrandWordmark from '../components/BrandWordmark';
 import Logo from '../components/Logo';
+import Button from '../components/ui/Button';
+import { BRAND } from '../lib/brand';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,8 +21,8 @@ export default function Login() {
 
   if (authLoading || user) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center text-on-surface-variant">
-        Cargando...
+      <div className="min-h-screen bg-background flex items-center justify-center text-on-surface-variant font-body-md">
+        Cargando…
       </div>
     );
   }
@@ -45,60 +48,73 @@ export default function Login() {
   }
 
   return (
-    <div className="bg-surface text-on-surface min-h-screen flex flex-col">
-      <div className="w-full px-margin-mobile pt-stack-md">
-        <Link to="/welcome" className="material-symbols-outlined text-primary inline-flex p-2 hover:bg-surface-container rounded-full">
-          arrow_back
+    <div className="min-h-screen bg-background text-on-surface flex flex-col">
+      <div className="page-container px-margin-mobile pt-stack-md">
+        <Link
+          to="/welcome"
+          className="inline-flex items-center justify-center w-11 h-11 rounded-full text-primary hover:bg-surface-container transition-colors"
+          aria-label="Volver"
+        >
+          <span className="material-symbols-outlined">arrow_back</span>
         </Link>
       </div>
 
-      <main className="flex-grow px-margin-mobile flex flex-col justify-center max-w-md mx-auto w-full pb-stack-lg">
-        <div className="flex justify-center mb-stack-lg">
-          <Logo size={80} />
+      <main className="page-container flex-1 px-margin-mobile flex flex-col justify-center w-full pb-stack-lg">
+        <div className="flex flex-col items-center text-center gap-stack-md mb-section-gap">
+          <Logo size={72} />
+          <BrandWordmark size="md" />
+          <p className="font-body-md text-body-md text-on-surface-variant">{BRAND.tagline}</p>
         </div>
-        <h1 className="font-headline-xl text-headline-xl text-primary font-extrabold mb-2">
+
+        <h1 className="font-headline-lg text-headline-lg text-on-surface text-center mb-2">
           {modo === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
         </h1>
-        <p className="font-body-md text-body-md text-on-surface-variant mb-section-gap">
+        <p className="font-body-md text-body-md text-on-surface-variant text-center mb-section-gap">
           Guarda favoritos y sincroniza tu despensa en todos tus dispositivos.
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-stack-md">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-stack-md" noValidate>
           <div>
-            <label className="font-label-sm text-label-sm text-on-surface-variant block mb-2">Correo</label>
+            <label htmlFor="email" className="font-label-sm text-label-sm text-on-surface-variant block mb-2">
+              Correo
+            </label>
             <input
+              id="email"
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-surface-container-low rounded-xl py-4 px-4 font-body-md text-body-md focus:ring-2 focus:ring-primary outline-none"
+              className="w-full min-h-[52px] bg-surface-container-lowest border border-outline-variant rounded-card py-3 px-4 font-body-md text-body-md focus:ring-2 focus:ring-primary outline-none shadow-card"
               placeholder="tu@correo.com"
             />
           </div>
           <div>
-            <label className="font-label-sm text-label-sm text-on-surface-variant block mb-2">Contraseña</label>
+            <label htmlFor="password" className="font-label-sm text-label-sm text-on-surface-variant block mb-2">
+              Contraseña
+            </label>
             <input
+              id="password"
               type="password"
               required
               minLength={6}
+              autoComplete={modo === 'login' ? 'current-password' : 'new-password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-surface-container-low rounded-xl py-4 px-4 font-body-md text-body-md focus:ring-2 focus:ring-primary outline-none"
+              className="w-full min-h-[52px] bg-surface-container-lowest border border-outline-variant rounded-card py-3 px-4 font-body-md text-body-md focus:ring-2 focus:ring-primary outline-none shadow-card"
               placeholder="Mínimo 6 caracteres"
             />
           </div>
 
           {mensaje ? (
-            <p className="font-label-sm text-label-sm text-error bg-error-container/30 p-3 rounded-lg">{mensaje}</p>
+            <p className="font-label-sm text-label-sm text-error bg-error-container/30 p-3 rounded-card" role="alert">
+              {mensaje}
+            </p>
           ) : null}
 
-          <button
-            type="submit"
-            disabled={cargando}
-            className="w-full py-4 bg-primary text-on-primary font-headline-md text-headline-md rounded-[24px] active:scale-95 transition-transform disabled:opacity-60"
-          >
-            {cargando ? 'Cargando...' : modo === 'login' ? 'Entrar' : 'Registrarme'}
-          </button>
+          <Button type="submit" disabled={cargando} size="lg">
+            {cargando ? 'Cargando…' : modo === 'login' ? 'Entrar' : 'Registrarme'}
+          </Button>
         </form>
 
         <button
@@ -107,14 +123,14 @@ export default function Login() {
             setModo(modo === 'login' ? 'signup' : 'login');
             setMensaje('');
           }}
-          className="mt-stack-lg font-label-lg text-label-lg text-primary text-center w-full py-2"
+          className="mt-stack-lg font-label-lg text-label-lg text-primary text-center w-full min-h-[48px] py-2 active:scale-95"
         >
           {modo === 'login' ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
         </button>
 
         <Link
           to="/ingredientes"
-          className="mt-stack-md text-center font-label-sm text-label-sm text-outline block"
+          className="mt-stack-md text-center font-label-sm text-label-sm text-on-surface-variant block py-2"
         >
           Continuar sin cuenta
         </Link>

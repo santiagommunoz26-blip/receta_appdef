@@ -1,33 +1,45 @@
+import { Link } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import BottomNav from '../components/BottomNav';
 import RecetaCard from '../components/RecetaCard';
+import EmptyState from '../components/EmptyState';
+import SectionHeader from '../components/ui/SectionHeader';
+import Button from '../components/ui/Button';
 import { useFavoritos } from '../context/FavoritosContext';
 import { useRecetas } from '../hooks/useRecetas';
-import { Link } from 'react-router-dom';
 
 export default function Favoritos() {
   const { favoritos } = useFavoritos();
   const { recetas, loading } = useRecetas({ soloFavoritos: favoritos });
 
   return (
-    <div className="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
-      <AppHeader titulo="RecetaFácil" subtitulo="Favoritos" showBack backTo="/recetas" />
+    <div className="min-h-screen bg-background text-on-surface flex flex-col pb-nav-safe">
+      <AppHeader pageTitle="Favoritos" showBack backTo="/home" showBrand={false} />
 
-      <main className="flex-grow px-margin-mobile pb-32">
-        <h1 className="font-headline-lg text-headline-lg text-on-background mb-stack-md">Tus recetas guardadas</h1>
+      <main className="page-container px-margin-mobile flex flex-col gap-section-gap py-stack-lg">
+        <SectionHeader
+          overline="Tu colección"
+          title="Recetas guardadas"
+          description="Las que marcaste con el corazón aparecen aquí."
+        />
 
         {loading ? (
-          <p className="text-on-surface-variant font-body-md">Cargando...</p>
-        ) : recetas.length === 0 ? (
-          <div className="text-center py-section-gap">
-            <span className="material-symbols-outlined text-outline text-[48px] mb-stack-md block">favorite</span>
-            <p className="font-body-md text-body-md text-on-surface-variant mb-stack-lg">
-              Aún no guardaste recetas. Toca el corazón en cualquier resultado.
-            </p>
-            <Link to="/recetas" className="inline-block px-6 py-3 bg-primary text-on-primary rounded-full font-label-lg text-label-lg">
-              Explorar recetas
-            </Link>
+          <div className="flex flex-col gap-stack-md animate-pulse">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-28 rounded-card bg-surface-container" />
+            ))}
           </div>
+        ) : recetas.length === 0 ? (
+          <EmptyState
+            variant="favorites"
+            title="Sin favoritos aún"
+            description="Toca el corazón en cualquier receta para guardarla aquí."
+            action={
+              <Button to="/recetas" icon="travel_explore">
+                Explorar recetas
+              </Button>
+            }
+          />
         ) : (
           <div className="flex flex-col gap-stack-md">
             {recetas.map((receta) => (

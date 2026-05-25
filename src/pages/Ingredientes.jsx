@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
+import BottomNav from '../components/BottomNav';
+import SectionHeader from '../components/ui/SectionHeader';
+import Button from '../components/ui/Button';
+import StickyCta from '../components/ui/StickyCta';
+import EmptyState from '../components/EmptyState';
 import { useDespensa } from '../context/IngredientesContext';
+import { useToast } from '../context/ToastContext';
 import { SUGERIDOS_POPULARES, normalizarIngrediente } from '../lib/recetas';
 
 const CATALOGO_BUSQUEDA = [
@@ -14,6 +20,7 @@ const CATALOGO_BUSQUEDA = [
 export default function Ingredientes() {
   const navigate = useNavigate();
   const { despensa, agregar, quitar } = useDespensa();
+  const { show } = useToast();
   const [busqueda, setBusqueda] = useState('');
 
   const sugeridosFiltrados = useMemo(() => {
@@ -28,75 +35,80 @@ export default function Ingredientes() {
       .slice(0, 12);
   }, [busqueda, despensa]);
 
+  function agregarIng(nombre) {
+    if (agregar(nombre)) show(`Añadido: ${nombre}`);
+    else show('Ya está en tu despensa', 'info');
+  }
+
   function agregarDesdeBusqueda() {
     const texto = busqueda.trim();
     if (!texto) return;
-    agregar(texto);
+    agregarIng(texto);
     setBusqueda('');
   }
 
   return (
-    <div className="bg-surface text-on-surface min-h-screen flex flex-col">
-      <AppHeader subtitulo="Ingredientes" showBack backTo="/welcome" />
+    <div className="min-h-screen bg-background text-on-surface flex flex-col pb-[calc(11rem+env(safe-area-inset-bottom,0px))]">
+      <AppHeader pageTitle="Tu despensa" showBack backTo="/home" showBrand={false} showAccount />
 
-      <main className="flex-1 px-margin-mobile pt-stack-sm pb-32">
-        <div className="mb-stack-lg">
-          <h1 className="font-headline-xl text-headline-xl text-primary mb-4">¿Qué tienes disponible?</h1>
-          <div className="h-40 w-full rounded-xl overflow-hidden mb-section-gap">
-            <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfSOr1pom_vPsFdRHTcQD7ZnuBOlMeyyIZ-Trx-dRpf4-qy4ufWLcJsO6AqxYCSr_biVBWWjhB6usV1JJo0MG0dFclJC8L9qvfajve-VteT8e2gfCIbzk9pr1OCl3uC6KCh7Lt67ycR4cZ8GCHHifaTsFNHt6_zddARWL9gNBxIBppueggElSDOmfFVe873CX4B5m5Q638KH1oWW5ZsdRfUHA1uhlBYGLj81U3CAOBspyFtYAAV-u75QpfHVnd-zcSaLPZ2lql8OYZ"
-              alt="Ingredientes frescos"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
+      <main className="page-container px-margin-mobile flex flex-col gap-section-gap py-stack-lg">
+        <SectionHeader
+          overline="Paso 1"
+          title="¿Qué tienes disponible?"
+          description="Añade lo que tengas en casa. Agrupamos ingredientes similares para encontrar recetas viables."
+        />
 
-        <div className="relative mb-section-gap">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+        <label className="relative block">
+          <span className="sr-only">Buscar ingrediente</span>
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant pointer-events-none">
+            search
+          </span>
           <input
-            type="text"
+            type="search"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && agregarDesdeBusqueda()}
-            placeholder="Busca ingredientes..."
-            className="w-full bg-surface-container-low border-none rounded-xl py-4 pl-12 pr-14 font-body-md text-body-md focus:ring-2 focus:ring-primary outline-none transition-all"
+            placeholder="Ej. tomate, pollo, arroz…"
+            className="w-full min-h-[52px] bg-surface-container-lowest border border-outline-variant rounded-card py-3 pl-12 pr-24 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow shadow-card"
           />
           {busqueda.trim() ? (
             <button
               type="button"
               onClick={agregarDesdeBusqueda}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-on-primary px-3 py-1.5 rounded-lg font-label-sm text-label-sm"
+              className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[40px] px-4 bg-primary text-on-primary rounded-btn font-label-sm text-label-sm font-bold active:scale-95"
             >
               Añadir
             </button>
           ) : null}
-        </div>
+        </label>
 
-        <section className="mb-section-gap">
-          <div className="flex items-center justify-between mb-stack-md">
-            <h2 className="font-headline-md text-headline-md text-on-surface">Agregados</h2>
-            <span className="text-label-sm font-label-sm text-outline-variant uppercase tracking-wider">
-              {despensa.length} items
-            </span>
-          </div>
+        <section>
+          <SectionHeader
+            title="En tu despensa"
+            description={despensa.length ? `${despensa.length} ingredientes listos` : 'Aún no agregaste ninguno.'}
+          />
           {despensa.length === 0 ? (
-            <p className="font-body-md text-body-md text-on-surface-variant">
-              Agrega ingredientes para encontrar recetas que puedas cocinar hoy.
-            </p>
+            <EmptyState
+              variant="pantry"
+              title="Despensa vacía"
+              description="Toca un sugerido o escribe en el buscador para empezar."
+            />
           ) : (
-            <div className="flex flex-wrap gap-stack-sm">
+            <div className="flex flex-wrap gap-2" role="list">
               {despensa.map((ing) => (
                 <div
                   key={ing}
-                  className="inline-flex items-center bg-secondary-container text-on-secondary-container px-4 py-2 rounded-full gap-2"
+                  role="listitem"
+                  className="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container pl-4 pr-2 py-2 rounded-pill shadow-sm"
                 >
                   <span className="font-label-lg text-label-lg">{ing}</span>
                   <button
                     type="button"
                     onClick={() => quitar(ing)}
-                    className="material-symbols-outlined text-[18px] hover:bg-on-secondary-container/10 rounded-full"
+                    className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-on-secondary-container/10 active:scale-95"
+                    aria-label={`Quitar ${ing}`}
                   >
-                    close
+                    <span className="material-symbols-outlined text-[20px]">close</span>
                   </button>
                 </div>
               ))}
@@ -105,14 +117,14 @@ export default function Ingredientes() {
         </section>
 
         <section>
-          <h2 className="font-headline-md text-headline-md text-on-surface mb-stack-md">Sugeridos</h2>
-          <div className="flex flex-wrap gap-stack-sm">
+          <SectionHeader title="Sugeridos" description="Un toque para añadir al instante." />
+          <div className="flex flex-wrap gap-2">
             {sugeridosFiltrados.map((ing) => (
               <button
                 key={ing}
                 type="button"
-                onClick={() => agregar(ing)}
-                className="inline-flex items-center bg-surface-container text-on-surface-variant px-4 py-2 rounded-full gap-2 hover:bg-surface-container-highest transition-colors"
+                onClick={() => agregarIng(ing)}
+                className="inline-flex items-center gap-1.5 min-h-[44px] bg-surface-container-lowest text-on-surface-variant border border-outline-variant px-4 rounded-pill hover:border-primary/40 hover:text-primary transition-colors active:scale-95"
               >
                 <span className="material-symbols-outlined text-[18px]">add</span>
                 <span className="font-label-lg text-label-lg">{ing}</span>
@@ -122,16 +134,17 @@ export default function Ingredientes() {
         </section>
       </main>
 
-      <div className="fixed bottom-0 left-0 w-full p-margin-mobile bg-gradient-to-t from-surface via-surface to-transparent pt-10">
-        <button
-          type="button"
+      <StickyCta aboveNav>
+        <Button
           onClick={() => navigate(despensa.length ? '/recetas' : '/recetas?todas=1')}
-          className="w-full bg-primary text-on-primary py-4 rounded-full font-label-lg text-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          size="lg"
+          icon="restaurant_menu"
         >
-          <span>{despensa.length ? 'Ver recetas con mi despensa' : 'Ver todas las recetas'}</span>
-          <span className="material-symbols-outlined">restaurant_menu</span>
-        </button>
-      </div>
+          {despensa.length ? 'Ver recetas con mi despensa' : 'Ver catálogo completo'}
+        </Button>
+      </StickyCta>
+
+      <BottomNav />
     </div>
   );
 }

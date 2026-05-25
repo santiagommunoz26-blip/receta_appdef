@@ -1,8 +1,11 @@
 import { useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import AppHeader from '../components/AppHeader';
 import BottomNav from '../components/BottomNav';
 import RecetaCard from '../components/RecetaCard';
+import EmptyState from '../components/EmptyState';
+import SectionHeader from '../components/ui/SectionHeader';
+import Button from '../components/ui/Button';
 import { useDespensa } from '../context/IngredientesContext';
 import { useRecetas } from '../hooks/useRecetas';
 
@@ -14,42 +17,54 @@ export default function Recetas() {
   const { recetas, loading, error } = useRecetas({ filtrarPorDespensa: filtroDespensa });
 
   const tituloResultados = useMemo(() => {
-    if (verTodas || !despensa.length) return 'Todas las recetas';
+    if (verTodas || !despensa.length) return 'Catálogo completo';
     return 'Recetas para ti';
   }, [verTodas, despensa.length]);
 
   return (
-    <div className="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
-      <AppHeader titulo="RecetaFácil" subtitulo="Resultados" showBack backTo="/ingredientes" />
+    <div className="min-h-screen bg-background text-on-surface flex flex-col pb-nav-safe">
+      <AppHeader pageTitle="Resultados" showBack backTo="/ingredientes" showBrand={false} />
 
-      <main className="flex-grow px-margin-mobile pb-32">
-        <div className="pt-stack-md pb-stack-lg">
-          <div className="flex items-baseline justify-between gap-2">
-            <h1 className="font-headline-lg text-headline-lg text-on-background">{tituloResultados}</h1>
-            <span className="font-label-lg text-label-lg text-primary bg-primary-container/10 px-3 py-1 rounded-full shrink-0">
-              {recetas.length} resultados
+      <main className="page-container px-margin-mobile flex flex-col gap-section-gap py-stack-lg">
+        <SectionHeader
+          overline={verTodas || !despensa.length ? 'Explorar' : 'Personalizado'}
+          title={tituloResultados}
+          description={
+            !verTodas && despensa.length > 0
+              ? `Con: ${despensa.join(', ')}`
+              : 'Descubre platos de todo el mundo.'
+          }
+          action={
+            <span className="inline-flex items-center font-label-lg text-label-lg text-primary bg-primary-container/15 px-3 py-1.5 rounded-pill shrink-0">
+              {loading ? '…' : recetas.length}
             </span>
-          </div>
-          {!verTodas && despensa.length > 0 ? (
-            <p className="font-label-sm text-label-sm text-on-surface-variant mt-2">
-              Según: {despensa.join(', ')}
-            </p>
-          ) : null}
-        </div>
+          }
+        />
 
         {loading ? (
-          <p className="text-on-surface-variant">Buscando recetas...</p>
-        ) : error ? (
-          <p className="text-error font-body-md">{error}</p>
-        ) : recetas.length === 0 ? (
-          <div className="text-center py-section-gap">
-            <p className="font-body-md text-body-md text-on-surface-variant mb-stack-md">
-              No encontramos recetas con esos ingredientes. Prueba agregar más o ver todas.
-            </p>
-            <Link to="/recetas?todas=1" className="text-primary font-label-lg text-label-lg underline">
-              Ver catálogo completo
-            </Link>
+          <div className="flex flex-col gap-stack-md animate-pulse">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-28 rounded-card bg-surface-container" />
+            ))}
           </div>
+        ) : error ? (
+          <p className="font-body-md text-body-md text-error bg-error-container/20 p-stack-md rounded-card">{error}</p>
+        ) : recetas.length === 0 ? (
+          <EmptyState
+            variant="search"
+            title="Sin coincidencias"
+            description="No encontramos recetas con esos ingredientes. Prueba añadir más o explora el catálogo."
+            action={
+              <>
+                <Button to="/recetas?todas=1" variant="tonal">
+                  Ver todas las recetas
+                </Button>
+                <Link to="/ingredientes" className="font-label-sm text-label-sm text-primary underline block text-center mt-3">
+                  Editar despensa
+                </Link>
+              </>
+            }
+          />
         ) : (
           <div className="flex flex-col gap-stack-md">
             {recetas.map((receta) => (

@@ -1,17 +1,27 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
-const STORAGE_KEY = 'recetafacil_despensa';
+const STORAGE_KEY = 'cookora_despensa';
+const LEGACY_KEY = 'recetafacil_despensa';
 const IngredientesContext = createContext(null);
 
 export function IngredientesProvider({ children }) {
   const [despensa, setDespensa] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      let saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        saved = localStorage.getItem(LEGACY_KEY);
+        if (saved) localStorage.setItem(STORAGE_KEY, saved);
+      }
       return saved ? JSON.parse(saved) : ['Huevo', 'Arroz', 'Tomate'];
     } catch {
       return ['Huevo', 'Arroz', 'Tomate'];
     }
   });
+
+  const despensaRef = useRef(despensa);
+  useEffect(() => {
+    despensaRef.current = despensa;
+  }, [despensa]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(despensa));
@@ -19,8 +29,10 @@ export function IngredientesProvider({ children }) {
 
   function agregar(nombre) {
     const limpio = nombre.trim();
-    if (!limpio) return;
-    setDespensa((prev) => (prev.some((i) => i.toLowerCase() === limpio.toLowerCase()) ? prev : [...prev, limpio]));
+    if (!limpio) return false;
+    if (despensaRef.current.some((i) => i.toLowerCase() === limpio.toLowerCase())) return false;
+    setDespensa((prev) => [...prev, limpio]);
+    return true;
   }
 
   function quitar(nombre) {

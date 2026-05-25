@@ -194,6 +194,23 @@ export function puntuarReceta(receta, despensaKeys) {
   return coincidencias / total;
 }
 
+/** Match despensa ↔ receta para badge en tarjetas */
+export function calcularMatchReceta(receta, despensa) {
+  if (!despensa?.length || !receta?.ingredientesList?.length) return null;
+  const keys = expandirDespensa(despensa);
+  const total = receta.ingredientesList.length;
+  const coincidencias = receta.ingredientesList.filter((ing) =>
+    ingredienteCoincide(ing.nombreOriginal || ing.nombre, keys)
+  ).length;
+  const porcentaje = Math.round((coincidencias / total) * 100);
+  let etiqueta = 'Explorar';
+  if (porcentaje >= 80) etiqueta = 'Casi lista';
+  else if (porcentaje >= 55) etiqueta = 'Buen match';
+  else if (porcentaje >= 30) etiqueta = 'Algunos faltan';
+
+  return { coincidencias, total, porcentaje, etiqueta };
+}
+
 export function filtrarRecetasPorDespensa(recetas, despensa) {
   if (!despensa.length) return recetas;
   const keys = expandirDespensa(despensa);

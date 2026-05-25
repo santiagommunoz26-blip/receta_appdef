@@ -2,14 +2,42 @@
 @config "../tailwind.config.js";
 
 * {
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: 'Nunito Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background-color: #f8fbee;
   color: #191d16;
   margin: 0;
+  min-height: 100dvh;
+}
+
+/* Jerarquía tipográfica — una sola familia, pesos distintos (Gestalt: similitud) */
+.text-display {
+  font-size: 2.25rem;
+  line-height: 2.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.text-overline {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Usabilidad: foco visible (WCAG) */
+:focus-visible {
+  outline: 2px solid #275300;
+  outline-offset: 2px;
 }
 
 .material-symbols-outlined {
@@ -26,5 +54,120 @@ body {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   font-feature-settings: 'liga';
-  -webkit-font-smoothing: antialiased;
+}
+
+/* Región común: contenedor de página centrado (Gestalt: proximidad + continuidad) */
+.page-container {
+  width: 100%;
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+.pb-nav-safe {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.pb-cta-safe {
+  padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animaciones — respetan prefers-reduced-motion */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.35s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.35s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out;
+}
+
+.animate-confetti {
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes heart-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-heart-pop {
+  animation: heart-pop 0.35s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .motion-safe\:transition-opacity,
+  .motion-safe\:transition-all,
+  .motion-safe\:active\:scale-95,
+  .motion-safe\:active\:scale-\[0\.98\],
+  .motion-safe\:active\:scale-\[0\.99\] {
+    transition: none !important;
+  }
+
+  .motion-reduce\:animate-none {
+    animation: none !important;
+  }
 }
