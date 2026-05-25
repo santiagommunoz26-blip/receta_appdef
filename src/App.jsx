@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { IngredientesProvider } from './context/IngredientesContext';
 import { FavoritosProvider } from './context/FavoritosContext';
@@ -19,7 +19,7 @@ import GuiaMarca from './pages/GuiaMarca';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AuthProvider>
         <ToastProvider>
           <IngredientesProvider>
@@ -43,6 +43,6 @@ export default function App() {
           </IngredientesProvider>
         </ToastProvider>
       </AuthProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
